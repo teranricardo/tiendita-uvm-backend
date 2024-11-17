@@ -1,8 +1,10 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { swaggerSpec } from './swagger.js';
 import connectDB from './config/db.js';
 import userRoutes from './routes/user.routes.js';
 import categoryRoutes from './routes/category.routes.js';
@@ -38,6 +40,9 @@ app.post('/upload', upload.single('file'), (req, res) => {
 // Middleware para servir archivos estáticos (Imágenes)
 app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Middleware para ver la docmentación (OpenAPI)
+app.use('/api/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // Middleware para manejar rutas no definidas
 app.use((req, res, next) => {
   res.status(404).json({ message: 'Ruta no encontrada' });
@@ -49,6 +54,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Ocurrió un error en el servidor' });
 });
 
+// Servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor en ejecución en el puerto ${PORT}`);
